@@ -1,0 +1,25 @@
+
+import requests
+from bs4 import BeautifulSoup
+from openpyxl import Workbook
+
+url = "https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=%EC%84%9C%EC%9A%B8+%EB%86%80%EA%B1%B0%EB%A6%AC&oquery=%EC%88%99%EB%B0%95&tqi=iL2ZOsprvhGssZP7qvRssssssdC-167911"
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+data = []
+
+selectors = [".inner", ".anotherSelector", ".yetAnotherSelector"]  # 원하는 선택자 리스트
+for selector in selectors:
+    items = soup.select(selector)
+    print(f"총 {len(items)}개의 아이템이 {selector}로부터 추출됨.")
+    for item in items:
+        item_text = item.text.strip()
+        data.append(item_text)
+
+workbook = Workbook()
+sheet = workbook.active
+
+for idx, item in enumerate(data, 1):
+    sheet.cell(row=idx, column=1, value=item)
+
+workbook.save("/Users/yangsigwan/Desktop/output.xlsx")
